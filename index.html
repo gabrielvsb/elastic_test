@@ -11,7 +11,7 @@
     </div>
     <button id="btnStart">Gravar</button>
     <button id="btnStop" disabled>Parar Gravação</button>
-    <button id="btnSendMail">Enviar Email</button>
+    <button id="btnSendMail" disabled>Enviar Email</button>
 
 <script>
     const startButton = document.getElementById('btnStart');
@@ -45,6 +45,7 @@
                 mediaRecorder.start();
                 startButton.disabled = true;
                 stopButton.disabled = false;
+                emailButton.disabled = true;
             })
             .catch(error => {
                 console.error('Erro ao gravar mensagem:', error);
@@ -60,8 +61,8 @@
     function saveAudio(audioBlob) {
         const formData = new FormData();
         formData.append('audio', audioBlob, 'audio.wav');
-
-        fetch('http://localhost/elastic_test/googleapi/save_audio.php', {
+        msg.innerText = 'Transcrevendo audio...';
+        fetch('http://localhost/elastic_test/api/googleapi/save_audio.php', {
             method: 'POST',
             body: formData
         })
@@ -79,13 +80,14 @@
         const formData = new FormData();
         formData.append('audio', audioFile);
 
-        fetch('http://localhost/elastic_test/googleapi/speech_to_text.php', {
+        fetch('http://localhost/elastic_test/api/googleapi/speech_to_text.php', {
             method: 'POST',
             body: formData
         })
             .then(response => response.json())
             .then(result => {
                 msg.innerText = result;
+                emailButton.disabled = false;
             })
             .catch(error => {
                 console.error('Error sending audio to server:', error);
@@ -98,13 +100,13 @@
         const formData = new FormData();
         formData.append('message', message);
 
-        fetch('http://localhost/elastic_test/emailapi/send_mail.php', {
+        fetch('http://localhost/elastic_test/api/emailapi/send_mail.php', {
             method: 'POST',
             body: formData
             })
-            .then(response => response.json())
+            .then(response => response.text())
             .then(result => {
-                console.log('Server response:', result);
+                alert(result);
             })
             .catch(error => {
                 console.error('Error sending mail:', error);

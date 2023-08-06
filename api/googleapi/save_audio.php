@@ -2,7 +2,7 @@
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['audio'])) {
     $audio = $_FILES['audio'];
 
-    $dir = '../temp/';
+    $dir = '../../temp/';
 
     $nameFile = uniqid('audio_') . '.wav';
 

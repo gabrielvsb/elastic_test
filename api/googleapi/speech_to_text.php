@@ -1,6 +1,6 @@
 <?php
 
-require '../vendor/autoload.php';
+require '../../vendor/autoload.php';
 # Imports the Google Cloud client library
 use Google\Cloud\Speech\V1\SpeechClient;
 use Google\Cloud\Speech\V1\RecognitionAudio;
