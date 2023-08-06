@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>E-lastic</title>
+</head>
+<body>
+    <h1>Grave sua mensagem</h1>
+    <div>
+        <p id="message"></p>
+    </div>
+    <button id="btnStart">Start Recording</button>
+    <button id="btnStop" disabled>Stop Recording</button>
+
+<script>
+    const startButton = document.getElementById('btnStart');
+    const stopButton = document.getElementById('btnStop');
+    const msg = document.getElementById('message');
+    let mediaRecorder;
+    let audioChunks = [];
+
+    startButton.addEventListener('click', startRecording);
+    stopButton.addEventListener('click', stopRecording);
+
+    function startRecording() {
+        msg.innerText = '';
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                mediaRecorder = new MediaRecorder(stream);
+
+                mediaRecorder.ondataavailable = event => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    saveAudio(audioBlob);
+                    audioPlayer.src = URL.createObjectURL(audioBlob);
+                    transcribeButton.disabled = false;
+                };
+
+                mediaRecorder.start();
+                startButton.disabled = true;
+                stopButton.disabled = false;
+            })
+            .catch(error => {
+                console.error('Erro ao gravar mensagem:', error);
+            });
+    }
+
+    function stopRecording() {
+        mediaRecorder.stop();
+        startButton.disabled = false;
+        stopButton.disabled = true;
+    }
+
+    function saveAudio(audioBlob) {
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'audio.wav');
+
+        fetch('http://localhost/elastic_test/googleapi/save_audio.php', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(result => {
+                console.log('Server response:', result.msg);
+                sendAudioToGoogleAPI(result.file_path)
+            })
+            .catch(error => {
+                console.error('Error sending audio to server:', error);
+            });
+    }
+
+    function sendAudioToGoogleAPI(audioFile){
+        const formData = new FormData();
+        formData.append('audio', audioFile);
+
+        fetch('http://localhost/elastic_test/googleapi/speech_to_text.php', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(result => {
+                msg.innerText = result;
+            })
+            .catch(error => {
+                console.error('Error sending audio to server:', error);
+            });
+    }
+
+
+</script>
+</body>
+</html>
