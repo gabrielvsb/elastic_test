@@ -84,12 +84,15 @@ function sendMail(){
     const formData = new FormData();
     formData.append('message', message);
 
+    msg.innerText = 'Enviando email...'
+
     fetch('http://localhost/elastic_test/api/emailapi/send_mail.php', {
         method: 'POST',
         body: formData
     })
         .then(response => response.text())
         .then(result => {
+            msg.innerText = "";
             alert(result);
         })
         .catch(error => {
