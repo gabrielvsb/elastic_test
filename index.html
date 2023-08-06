@@ -40,8 +40,6 @@
                 mediaRecorder.onstop = () => {
                     const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                     saveAudio(audioBlob);
-                    audioPlayer.src = URL.createObjectURL(audioBlob);
-                    transcribeButton.disabled = false;
                 };
 
                 mediaRecorder.start();
@@ -95,6 +93,11 @@
     }
 
     function sendMail(){
+        const message = document.getElementById('message').textContent;
+
+        const formData = new FormData();
+        formData.append('message', message);
+
         fetch('http://localhost/elastic_test/emailapi/send_mail.php', {
             method: 'POST',
             body: formData
@@ -104,7 +107,7 @@
                 console.log('Server response:', result);
             })
             .catch(error => {
-                console.error('Error sending audio to server:', error);
+                console.error('Error sending mail:', error);
             });
     }
 
