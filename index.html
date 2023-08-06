@@ -9,18 +9,21 @@
     <div>
         <p id="message"></p>
     </div>
-    <button id="btnStart">Start Recording</button>
-    <button id="btnStop" disabled>Stop Recording</button>
+    <button id="btnStart">Gravar</button>
+    <button id="btnStop" disabled>Parar Gravação</button>
+    <button id="btnSendMail">Enviar Email</button>
 
 <script>
     const startButton = document.getElementById('btnStart');
     const stopButton = document.getElementById('btnStop');
+    const emailButton = document.getElementById('btnSendMail');
     const msg = document.getElementById('message');
     let mediaRecorder;
     let audioChunks = [];
 
     startButton.addEventListener('click', startRecording);
     stopButton.addEventListener('click', stopRecording);
+    emailButton.addEventListener('click', sendMail);
 
     function startRecording() {
         msg.innerText = '';
@@ -85,6 +88,20 @@
             .then(response => response.json())
             .then(result => {
                 msg.innerText = result;
+            })
+            .catch(error => {
+                console.error('Error sending audio to server:', error);
+            });
+    }
+
+    function sendMail(){
+        fetch('http://localhost/elastic_test/emailapi/send_mail.php', {
+            method: 'POST',
+            body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log('Server response:', result);
             })
             .catch(error => {
                 console.error('Error sending audio to server:', error);

@@ -10,7 +10,7 @@ use Google\Cloud\Speech\V1\RecognitionConfig\AudioEncoding;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['audio'])) {
     $responseJson = array();
 
-    $arquivo = '.' . $_POST['audio'];
+    $arquivo = $_POST['audio'];
 
 
     $audio = file_get_contents($arquivo);
